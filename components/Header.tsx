@@ -10,7 +10,9 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 export default function Header() {
+  const { data: session } = useSession();
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
@@ -38,10 +40,26 @@ export default function Header() {
             >
               Budget Tracker
             </Typography>
-            <Button color="inherit">Login</Button>
-            <Button LinkComponent={Link} href="/signup" color="inherit">
-              Sign Up
-            </Button>
+            {session ? (
+              <>
+                <Typography sx={{ mr: 2 }}>{session.user?.name}</Typography>
+                <Button
+                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  color="inherit"
+                >
+                  Log Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button component={Link} href="/login" color="inherit">
+                  Log In
+                </Button>
+                <Button component={Link} href="/signup" color="inherit">
+                  Sign Up
+                </Button>
+              </>
+            )}
           </Toolbar>
         </AppBar>
       </Box>

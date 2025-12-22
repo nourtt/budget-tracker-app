@@ -55,7 +55,12 @@ export default function LogInPage() {
           >
             Log In
           </Button>
-          <Button fullWidth variant="outlined" sx={{ mb: 2 }}>
+          <Button
+            fullWidth
+            onClick={() => signIn("google", { callbackUrl: "/" })}
+            variant="outlined"
+            sx={{ mb: 2 }}
+          >
             <GoogleIcon style={{ marginRight: 8 }} />
             Log In with Google
           </Button>

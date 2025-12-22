@@ -42,7 +42,7 @@ export const authConfig = {
           user.password
         );
         if (!isValid) return null;
-        return { id: user.id, email: user.email, username: user.username };
+        return { id: user.id, email: user.email, name: user.username };
       },
     }),
   ],
