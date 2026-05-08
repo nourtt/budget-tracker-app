@@ -24,12 +24,28 @@ export async function POST(request: Request) {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       username,
       email,
       password: hashedPassword,
     },
+  });
+
+  await prisma.category.createMany({
+    data: [
+      { name: "Food", userId: user.id },
+      { name: "Transport", userId: user.id },
+      { name: "Housing", userId: user.id },
+      { name: "Utilities", userId: user.id },
+      { name: "Entertainment", userId: user.id },
+      { name: "Shopping", userId: user.id },
+      { name: "Health", userId: user.id },
+      { name: "Other", userId: user.id },
+      { name: "Salary", userId: user.id },
+      { name: "Gifts", userId: user.id },
+      { name: "Investment", userId: user.id },
+    ],
   });
 
   return NextResponse.json({ success: true }, { status: 201 });
