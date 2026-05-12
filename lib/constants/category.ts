@@ -1,4 +1,8 @@
-export const categoryList = [
+/** Shown when transaction type is Income */
+export const incomeCategoryList = ["Salary", "Gifts", "Investment"] as const;
+
+/** Shown when transaction type is Expense */
+export const expenseCategoryList = [
   "Food",
   "Transport",
   "Housing",
@@ -7,7 +11,10 @@ export const categoryList = [
   "Shopping",
   "Health",
   "Other",
-  "Salary",
-  "Gifts",
-  "Investment",
-];
+] as const;
+
+/** All category names (e.g. history, APIs) */
+export const categoryList = [
+  ...expenseCategoryList,
+  ...incomeCategoryList,
+] as const;

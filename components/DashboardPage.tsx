@@ -16,7 +16,10 @@ import {
 } from "@mui/material";
 import Header from "./Header";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { categoryList } from "../lib/constants/category";
+import {
+  expenseCategoryList,
+  incomeCategoryList,
+} from "../lib/constants/category";
 import dayjs, { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers";
 
@@ -33,7 +36,7 @@ export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("INCOME");
-  const [category, setCategory] = useState("Other");
+  const [category, setCategory] = useState<string>(incomeCategoryList[0]);
   const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
@@ -100,7 +103,7 @@ export default function DashboardPage() {
     setOpen(false);
     setAmount("");
     setType("INCOME");
-    setCategory("Other");
+    setCategory(incomeCategoryList[0]);
     setDate(dayjs());
     setNote("");
     await loadHistory();
@@ -254,7 +257,19 @@ export default function DashboardPage() {
                 select
                 label="Type"
                 value={type}
-                onChange={(e) => setType(e.target.value)}
+                onChange={(e) => {
+                  const nextType = e.target.value as "INCOME" | "EXPENSE";
+                  setType(nextType);
+                  const allowed =
+                    nextType === "INCOME"
+                      ? incomeCategoryList
+                      : expenseCategoryList;
+                  setCategory((prev) =>
+                    (allowed as readonly string[]).includes(prev)
+                      ? prev
+                      : allowed[0],
+                  );
+                }}
                 margin="normal"
               >
                 <MenuItem value="INCOME">Income</MenuItem>
@@ -268,7 +283,10 @@ export default function DashboardPage() {
                 onChange={(e) => setCategory(e.target.value)}
                 margin="normal"
               >
-                {categoryList.map((cat) => (
+                {(type === "INCOME"
+                  ? incomeCategoryList
+                  : expenseCategoryList
+                ).map((cat) => (
                   <MenuItem key={cat} value={cat}>
                     {cat}
                   </MenuItem>
