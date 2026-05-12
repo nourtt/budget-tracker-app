@@ -15,7 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import Header from "./Header";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { categoryList } from "../lib/constants/category";
 import dayjs, { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -66,6 +66,16 @@ export default function DashboardPage() {
     };
   }, [loadHistory]);
 
+  const balanceLabel = useMemo(() => {
+    const total = history.reduce((acc, row) => {
+      return acc + (row.type === "INCOME" ? row.amount : -row.amount);
+    }, 0);
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(total);
+  }, [history]);
+
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
@@ -111,9 +121,27 @@ export default function DashboardPage() {
           <Typography variant="h3" gutterBottom>
             Current Balance:
           </Typography>
-          <Typography variant="h4" gutterBottom>
-            $0.00
-          </Typography>
+          {historyLoading ? (
+            <Box
+              sx={{
+                minHeight: 48,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+              }}
+            >
+              <CircularProgress size={32} />
+            </Box>
+          ) : historyError ? (
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              —
+            </Typography>
+          ) : (
+            <Typography variant="h4" gutterBottom>
+              {balanceLabel}
+            </Typography>
+          )}
           <Button
             variant="contained"
             color="primary"
