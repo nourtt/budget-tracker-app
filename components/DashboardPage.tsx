@@ -3,17 +3,32 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   Dialog,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
   MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
 import Header from "./Header";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { categoryList } from "../lib/constants/category";
 import dayjs, { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers";
+
+type TransactionRow = {
+  id: string;
+  amount: number;
+  type: "INCOME" | "EXPENSE";
+  note: string | null;
+  createdAt: string;
+  category: { name: string } | null;
+};
+
 export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
@@ -22,6 +37,35 @@ export default function DashboardPage() {
   const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
+  const [history, setHistory] = useState<TransactionRow[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [historyError, setHistoryError] = useState("");
+
+  const loadHistory = useCallback(async () => {
+    setHistoryError("");
+    const res = await fetch("/api/transactions");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setHistoryError(data.error || "Could not load history");
+      setHistory([]);
+      return;
+    }
+    const data = (await res.json()) as TransactionRow[];
+    setHistory(data);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setHistoryLoading(true);
+      await loadHistory();
+      if (!cancelled) setHistoryLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadHistory]);
+
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
@@ -49,6 +93,7 @@ export default function DashboardPage() {
     setCategory("Other");
     setDate(dayjs());
     setNote("");
+    await loadHistory();
   };
   return (
     <div>
@@ -76,6 +121,87 @@ export default function DashboardPage() {
           >
             Add Transaction
           </Button>
+
+          <Box sx={{ width: "100%", maxWidth: 560, mt: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              History
+            </Typography>
+            {historyLoading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
+                <CircularProgress size={28} />
+              </Box>
+            ) : historyError ? (
+              <Typography color="error" variant="body2">
+                {historyError}
+              </Typography>
+            ) : history.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                No transactions yet.
+              </Typography>
+            ) : (
+              <List dense disablePadding sx={{ bgcolor: "background.paper" }}>
+                {history.map((row, index) => (
+                  <Box key={row.id}>
+                    {index > 0 ? <Divider component="li" /> : null}
+                    <ListItem alignItems="flex-start">
+                      <ListItemText
+                        primary={
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              gap: 2,
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            <Typography component="span" variant="body1">
+                              {row.category?.name ?? "Uncategorized"}
+                            </Typography>
+                            <Typography
+                              component="span"
+                              variant="body1"
+                              fontWeight={600}
+                              color={
+                                row.type === "INCOME"
+                                  ? "success.main"
+                                  : "error.main"
+                              }
+                            >
+                              {row.type === "INCOME" ? "+" : "-"}$
+                              {row.amount.toFixed(2)}
+                            </Typography>
+                          </Box>
+                        }
+                        secondary={
+                          <>
+                            <Typography
+                              component="span"
+                              variant="caption"
+                              color="text.secondary"
+                              display="block"
+                            >
+                              {dayjs(row.createdAt).format("MMM D, YYYY")} ·{" "}
+                              {row.type === "INCOME" ? "Income" : "Expense"}
+                            </Typography>
+                            {row.note ? (
+                              <Typography
+                                component="span"
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {row.note}
+                              </Typography>
+                            ) : null}
+                          </>
+                        }
+                      />
+                    </ListItem>
+                  </Box>
+                ))}
+              </List>
+            )}
+          </Box>
+
           <Dialog open={open} onClose={() => setOpen(false)}>
             <Box
               component="form"
@@ -133,12 +259,26 @@ export default function DashboardPage() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
               />
+              {error ? (
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                  {error}
+                </Typography>
+              ) : null}
               <Button
-                variant="contained"
+                variant="outlined"
                 color="primary"
+                sx={{ mt: 2, mr: 2 }}
                 onClick={() => setOpen(false)}
               >
                 Close
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                sx={{ mt: 2 }}
+              >
+                Add Transaction
               </Button>
             </Box>
           </Dialog>
