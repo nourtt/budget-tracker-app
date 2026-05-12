@@ -14,7 +14,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import Header from "./Header";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   expenseCategoryList,
@@ -110,7 +109,6 @@ export default function DashboardPage() {
   };
   return (
     <div>
-      <Header />
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Box
           sx={{

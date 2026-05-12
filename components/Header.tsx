@@ -11,22 +11,31 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-export default function Header() {
+
+type HeaderProps = {
+  /** When set, the menu icon toggles the dashboard sidebar on small screens. */
+  onMenuClick?: () => void;
+};
+
+export default function Header({ onMenuClick }: HeaderProps) {
   const { data: session } = useSession();
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar color="primary" position="static">
           <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 1 }}
-            >
-              <MenuIcon />
-            </IconButton>
+            {onMenuClick ? (
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="open navigation menu"
+                sx={{ mr: 1 }}
+                onClick={onMenuClick}
+              >
+                <MenuIcon />
+              </IconButton>
+            ) : null}
             <Typography
               variant="h6"
               component={Link}
