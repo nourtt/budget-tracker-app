@@ -21,7 +21,7 @@ import {
 } from "../lib/constants/category";
 import dayjs, { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 type TransactionRow = {
   id: string;
   amount: number;
@@ -30,7 +30,7 @@ type TransactionRow = {
   createdAt: string;
   category: { name: string } | null;
 };
-
+import { IconButton } from "@mui/material";
 export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
@@ -56,6 +56,21 @@ export default function DashboardPage() {
     setHistory(data);
   }, []);
 
+  const onDelete = async (id: string) => {
+    const res = await fetch(`/api/transactions/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setHistoryError(data.error || "Could not delete transaction");
+      return;
+    }
+    await loadHistory();
+  };
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -188,6 +203,7 @@ export default function DashboardPage() {
                             </Typography>
                             <Typography
                               component="span"
+                              gap={2}
                               variant="body1"
                               fontWeight={600}
                               color={
@@ -198,6 +214,12 @@ export default function DashboardPage() {
                             >
                               {row.type === "INCOME" ? "+" : "-"}$
                               {row.amount.toFixed(2)}
+                              <IconButton
+                                color="error"
+                                onClick={() => onDelete(row.id)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
                             </Typography>
                           </Box>
                         }
