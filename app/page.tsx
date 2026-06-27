@@ -1,5 +1,11 @@
 import HomePage from "@/components/HomePage";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+export default async function Home() {
+  const session = await auth();
 
-export default function Home() {
+  if (session) {
+    redirect("/dashboard");
+  }
   return <HomePage />;
 }

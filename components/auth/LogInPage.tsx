@@ -20,7 +20,11 @@ export default function LogInPage() {
     if (res?.error) {
       console.error("Login failed:", res.error);
     }
-    window.location.href = "/dashboard";
+    if (res?.ok) {
+      window.location.href = "/dashboard";
+    } else {
+      console.error("Login failed:", res?.error);
+    }
   };
   return (
     <div>

@@ -22,6 +22,7 @@ import {
 import dayjs, { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Header from "./Header";
 type TransactionRow = {
   id: string;
   amount: number;
@@ -31,6 +32,7 @@ type TransactionRow = {
   category: { name: string } | null;
 };
 import { IconButton } from "@mui/material";
+
 export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
@@ -124,6 +126,7 @@ export default function DashboardPage() {
   };
   return (
     <div>
+      <Header />
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Box
           sx={{

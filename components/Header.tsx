@@ -4,38 +4,62 @@ import {
   AppBar,
   Box,
   Button,
+  Drawer,
   IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Toolbar,
   Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-
-type HeaderProps = {
-  /** When set, the menu icon toggles the dashboard sidebar on small screens. */
-  onMenuClick?: () => void;
-};
-
-export default function Header({ onMenuClick }: HeaderProps) {
+import { useState } from "react";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import SettingsIcon from "@mui/icons-material/Settings";
+export default function Header() {
   const { data: session } = useSession();
+  const [open, setOpen] = useState(false);
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar color="primary" position="static">
           <Toolbar>
-            {onMenuClick ? (
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="open navigation menu"
-                sx={{ mr: 1 }}
-                onClick={onMenuClick}
-              >
-                <MenuIcon />
-              </IconButton>
-            ) : null}
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="open navigation menu"
+              sx={{ mr: 1 }}
+              onClick={() => setOpen(!open)}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Drawer open={open} onClose={() => setOpen(false)}>
+              <Box sx={{ width: 250 }}>
+                <List>
+                  <ListItem disablePadding>
+                    <ListItemButton component={Link} href="/dashboard">
+                      <ListItemIcon>
+                        <DashboardIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Dashboard" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton component={Link} href="/settings">
+                      <ListItemIcon>
+                        <SettingsIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Settings" />
+                    </ListItemButton>
+                  </ListItem>
+                </List>
+              </Box>
+            </Drawer>
             <Typography
               variant="h6"
               component={Link}
