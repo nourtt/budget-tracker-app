@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Budget Tracker on Next.js
+
+A TypeScript budget tracker built with Next.js, Prisma, PostgreSQL, and NextAuth.
+
+Users can sign up, sign in with credentials or Google, track income and expenses, and review transaction history in a clean dashboard UI.
+
+## Features
+
+- Email / username sign-up with secure password hashing
+- Credential login and Google SSO via NextAuth
+- Add income and expense transactions with category, date, and note
+- Display current balance and transaction history
+- Delete transactions from history
+- Category support for common income and expense types
+- User session management with protected API routes
+
+## Tech stack
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- NextAuth
+- Material UI
+- Day.js
+- Tailwind CSS / PostCSS support
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file with at least the following:
+
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+```
+
+`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are required only if you want Google login.
+
+### 3. Initialize Prisma
+
+Generate the Prisma client and apply migrations:
+
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+```
+
+If you already have an existing database and want to push schema changes without generating a new migration, use:
+
+```bash
+npx prisma db push
+```
+
+### 4. Run the app
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Visit `/signup` to create a new account
+- Visit `/login` to sign in with email/username and password or Google
+- After login, access the dashboard to add and manage transactions
+- The dashboard shows your current balance and recent history
 
-## Learn More
+## Database schema
 
-To learn more about Next.js, take a look at the following resources:
+The app stores:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `User` with username, email, password, transactions, and categories
+- `Transaction` with amount, type, category, note, and timestamp
+- `Category` to classify user transactions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Predefined categories are created automatically for new users during registration.
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev` — start local development server
+- `npm run build` — build production bundle
+- `npm run start` — start production server
+- `npm run lint` — run ESLint
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+
+- The `app/api/register/route.ts` endpoint registers new users and seeds default categories
+- The `app/api/transactions/route.ts` endpoint supports listing, creating, and deleting transactions
+- The settings UI is present in the app, and account update behavior may require the corresponding API route to be implemented
+
+## Project structure
+
+- `app/` — Next.js app routes and pages
+- `components/` — reusable UI components
+- `lib/` — Prisma client and auth helpers
+- `prisma/` — database schema and migrations
+- `scripts/` — utility scripts
+
+## License
+
+This project is released under the [MIT License](LICENSE) if applicable.
